@@ -12,6 +12,8 @@ USING: binfile ;
 
 IN: propeller-loader
 
+TUPLE: load file fbarray ;
+
 
 
 : loader-lines ( -- )
@@ -29,7 +31,19 @@ IN: propeller-loader
 : loader-files ( path -- )
     [ dup "-" = [ drop loader-lines ] [ loader-file ] if ] each ;
 
+! test if file ok load into a array
+: readentirefile ( loader -- loader' )
+    [ file>> ] keep swap
+    [
+        [ file>> ] keep swap <binfile> >>fbarray
+    ]
+    [
+
+    ] if ;
+
+
 : run-loader ( -- )
+    load new    ! allocate some memory for tuple
     command-line get [ loader-lines ] [ loader-files ] if-empty
 ;
 
