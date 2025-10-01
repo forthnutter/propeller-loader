@@ -41,10 +41,16 @@ TUPLE: load file fbarray ;
 
     ] if ;
 
+! idea here is create a fake command line for testing purpose
+: fake-command-line ( -- )
+
+;
 
 : run-loader ( -- )
     load new    ! allocate some memory for tuple
+    fake-command-line
     command-line get [ loader-lines ] [ loader-files ] if-empty
+    drop
 ;
 
 MAIN: run-loader
