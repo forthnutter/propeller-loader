@@ -15,6 +15,15 @@ IN: propeller-loader
 TUPLE: load file fbarray ;
 
 
+: loader-usage ( -- )
+    "Usage: loader [optons] [file] [arguments]" print
+    "    [options]" print
+    "        -b=<type>        Select target board and subtype (default is default:default)" print
+    "        -board=<type>    same as above" print
+    "        -c               Display numeric message codes" print
+    "        -D=var:value     Define a board configuration variable" print
+    "        -e               program eeprom and halt unless -r is specified" print
+    "        "
 
 : loader-lines ( -- )
     [ write nl flush ] each-line ;
@@ -43,7 +52,8 @@ TUPLE: load file fbarray ;
 
 ! idea here is create a fake command line for testing purpose
 : fake-command-line ( -- )
-
+    { "run-loader" "-b" "-f=LongSpinCode.binary" } parse-command-line
+    script get command-line get (command-line)
 ;
 
 : run-loader ( -- )
