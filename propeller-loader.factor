@@ -16,14 +16,18 @@ TUPLE: load file fbarray ;
 
 
 : loader-usage ( -- )
-    "Usage: loader [optons] [file] [arguments]" print
+    "Usage: loader [optons] [script] [file]" print
     "    [options]" print
     "        -b=<type>        Select target board and subtype (default is default:default)" print
     "        -board=<type>    same as above" print
     "        -c               Display numeric message codes" print
     "        -D=var:value     Define a board configuration variable" print
     "        -e               program eeprom and halt unless -r is specified" print
-    "        "
+    "    [script]" print
+    "        configuration file name .cfg" print
+    "    [file]" print
+    "        file name of binary file to be loaded" print
+;
 
 : loader-lines ( -- )
     [ write nl flush ] each-line ;
@@ -33,12 +37,11 @@ TUPLE: load file fbarray ;
 
 
 : loader-file ( path -- )
-    dup file-exists?
-    [ binary [ loader-stream ] with-file-reader ]
-    [ write ": not found" write nl flush ] if ;
+    <binfile> [ drop loader-usage ] [ break drop ] if-empty
+;
 
 : loader-files ( path -- )
-    [ dup "-" = [ drop loader-lines ] [ loader-file ] if ] each ;
+    [ [ loader-usage ] [ loader-file ] if-empty ] each ;
 
 ! test if file ok load into a array
 : readentirefile ( loader -- loader' )
@@ -52,14 +55,13 @@ TUPLE: load file fbarray ;
 
 ! idea here is create a fake command line for testing purpose
 : fake-command-line ( -- )
-    { "run-loader" "-b" "-f=LongSpinCode.binary" } parse-command-line
-    script get command-line get (command-line)
+    { "run-loader" "-b" "script" "work/propeller-loader/LongSpinCode.binary" "LongSpinCode1.binary" } parse-command-line
 ;
 
 : run-loader ( -- )
     load new    ! allocate some memory for tuple
     fake-command-line
-    command-line get [ loader-lines ] [ loader-files ] if-empty
+    command-line get [ loader-usage ] [ loader-files ] if-empty
     drop
 ;
 
