@@ -8,11 +8,11 @@ USING: accessors byte-arrays combinators command-line grouping io io.encodings.b
        tools.continuations vocabs.metadata ;
 
 ! local function found in working directory 
-USING: binfile ;
+USING: binfile propeller-loader.prop-image ;
 
 IN: propeller-loader
 
-TUPLE: load file fbarray ;
+TUPLE: load file objarray ;
 
 
 : loader-usage ( -- )
@@ -29,15 +29,8 @@ TUPLE: load file fbarray ;
     "        file name of binary file to be loaded" print
 ;
 
-: loader-lines ( -- )
-    [ write nl flush ] each-line ;
-
-: loader-stream ( -- )
-    [ 1024 read dup ] [ >string write flush ] while drop ;
-
-
-: loader-file ( path -- )
-    <binfile> [ drop loader-usage ] [ break drop ] if-empty
+: loader-file ( path -- ? )
+    <binfile> [ drop loader-usage f ] [ break <pimage> ] if-empty
 ;
 
 : loader-files ( path -- )
@@ -55,11 +48,16 @@ TUPLE: load file fbarray ;
 
 ! idea here is create a fake command line for testing purpose
 : fake-command-line ( -- )
-    { "run-loader" "-b" "script" "work/propeller-loader/LongSpinCode.binary" "LongSpinCode1.binary" } parse-command-line
+    { "run-loader" "-b" "script" "work/propeller-loader/LargeSpinCode.binary" "LongSpinCode1.binary" } parse-command-line
+;
+
+: <loader> ( -- obj )
+    load new    ! allocate some memory for tuple
+    V{ } clone >>objarray
 ;
 
 : run-loader ( -- )
-    load new    ! allocate some memory for tuple
+    <loader>            ! create obj
     fake-command-line
     command-line get [ loader-usage ] [ loader-files ] if-empty
     drop
