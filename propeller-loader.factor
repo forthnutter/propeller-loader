@@ -8,26 +8,10 @@ USING: accessors byte-arrays combinators command-line grouping io io.encodings.b
        tools.continuations vocabs.metadata ;
 
 ! local function found in working directory 
-USING: binfile propeller-loader.prop-image ;
+USING: binfile propeller-loader.loader loaderpropeller-loader.prop-image ;
 
 IN: propeller-loader
 
-TUPLE: load file objarray ;
-
-
-: loader-usage ( -- )
-    "Usage: loader [optons] [script] [file]" print
-    "    [options]" print
-    "        -b=<type>        Select target board and subtype (default is default:default)" print
-    "        -board=<type>    same as above" print
-    "        -c               Display numeric message codes" print
-    "        -D=var:value     Define a board configuration variable" print
-    "        -e               program eeprom and halt unless -r is specified" print
-    "    [script]" print
-    "        configuration file name .cfg" print
-    "    [file]" print
-    "        file name of binary file to be loaded" print
-;
 
 : loader-file ( path -- ? )
     <binfile> [ drop loader-usage f ] [ break <pimage> ] if-empty
