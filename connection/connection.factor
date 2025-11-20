@@ -1,67 +1,90 @@
 ! handles connection to propeller
 
-USING: kernel syntax ;
+USING: accessors kernel tools.continuations
+ ;
 
 IN: propeller-loader.connection
 
+
+
 TUPLE: connection portname baudrate config ;
 
-! GENERIC: is-open ( -- ? )
 
-M: connection is-open ( -- ? )
-    f ;
-
-M: connection close ( -- i )
-    0 ;
-
-M: connection connect ( -- i )
-    0 ;
-
-M: connection disconnect ( -- i )
-    0 ;
-
-M: connection set-reset-method ( method -- i )
-    0 ;
-
-M: connection generater-reset-signal ( -- i )
-    0 ;
-
-M: connection identify ( version -- i )
-    0 ;
-
-M: connection load-image ( image imageSize response responseSize -- i )
-    0 ;
-
-M: connection load-image ( image imageSize ltDownloadAndRun  info -- i )
-    0 ;
-
-M: connection receive-data-timeout ( buf len timeout -- i )
-    0 ;
+GENERIC: close ( connection -- i )
+GENERIC: connect ( connection -- i )
+GENERIC: disconnect ( connection -- i )
+GENERIC: generater-reset-signal ( connection -- i )
+GENERIC: get-config ( connection -- config )
+GENERIC: identify ( connection version -- i )
+GENERIC: is-open ( connection -- ? )
+GENERIC: load-image ( connection image imageSize response responseSize -- i )
+GENERIC: load-image2 ( connection image imageSize ltDownloadAndRun  info -- i )
+GENERIC: max-data-size ( connection -- i )
+GENERIC: port-name ( connection -- portname )
+GENERIC: receive-data-exact-timeout ( connection buf len timeout -- i )
+GENERIC: receive-data-timeout ( connection buf len timeout -- i )
+GENERIC: send-data ( connection buf len -- i )
+GENERIC: set-baud-rate ( connection baudrate -- i )
+GENERIC: set-config ( connection config -- )
+GENERIC: set-port-name ( connection portName -- )
+GENERIC: set-reset-method ( connection method -- i )
+GENERIC: terminal ( connection ?check  ?mode -- i )
 
 
-M: connection send-data ( buf len -- i )
-    0 ;
+M: connection is-open
+    drop f ;
 
-M: connection receive-data-exact-timeout ( buf len timeout -- i )
-    0 ;
+M: connection close
+    drop 0 ;
 
-M: connection set-baud-rate ( baudrate -- i )
-    0 ;
+M: connection connect
+    drop 0 ;
 
-M: connection max-data-size ( -- i )
-    0 ;
+M: connection disconnect
+    drop 0 ;
 
-M: connection terminal ( ?check  ?mode -- i )
-    0 ;
+M: connection set-reset-method
+    drop drop 0 ;
 
-M: connection port-name ( -- portname )
+M: connection generater-reset-signal
+    drop 0 ;
+
+M: connection identify
+    drop drop 0 ;
+
+M: connection load-image
+    drop drop drop drop drop 0 ;
+
+M: connection load-image2
+    drop drop drop drop drop 0 ;
+
+M: connection receive-data-timeout
+    drop drop drop drop 0 ;
+
+
+M: connection send-data
+    drop drop drop 0 ;
+
+M: connection receive-data-exact-timeout
+    drop drop drop drop 0 ;
+
+M: connection set-baud-rate
+    drop drop 0 ;
+
+M: connection max-data-size
+    drop 0 ;
+
+M: connection terminal
+    drop drop drop 0 ;
+
+M: connection port-name
     [ portname>> 0 = not ] keep swap 
-    [ portname>> ] [ "<none>" ] if
+    [ portname>> ] [ drop "<none>" ] if
 ;
 
-M: connection set-port-name ( portName -- )
+M: connection set-port-name
     [ 0 = ] keep swap
-    [ portname<< ] [ drop ] if ;
+    [ portname<< ] [ drop drop ] if ;
 
 !        if (m_portName)
 !            free(m_portName);
@@ -70,10 +93,10 @@ M: connection set-port-name ( portName -- )
 !    }
 
 
-M: connection set-config ( config -- )
+M: connection set-config
     config<< ;
 
-M: connection get-config ( -- config )
+M: connection get-config
     config>> ;
 
 : <connection> ( -- connection )

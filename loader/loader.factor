@@ -1,15 +1,27 @@
 ! create loader from c++
 
-USING: kernel propeller-loader.connection ;
+USING: accessors binfile kernel propeller-loader.prop-image propeller-loader.connection sequences tools.continuations ;
 
 IN: propeller-loader.loader
 
 TUPLE: loader file connection array ;
 
+GENERIC: fast-load-file ( loader file loadtype -- i )
+GENERIC: fast-load-image ( loader image imagesize loadtype -- i )
+GENERIC: fast-load-image-help ( loader image imagesize loadtype clockspeed clockmode baudrate fastloaderbaudrate -- i )
+GENERIC: generate-initial-loader-image ( loader clockSpeed clockMode packetID loaderBaudRate fastLoaderBaudRate Length -- i )
+GENERIC: load-file ( loader file loadType -- i )
+GENERIC: load-image ( loader image imagesize loadtype -- i )
+GENERIC: read-elf-file ( loader fp hdr pImageSize -- i )
+GENERIC: read-file ( loader file imagesize -- data )
+GENERIC: read-spin-binary-file ( loader fp pImageSize -- i )
+GENERIC: set-connection ( loader connection -- )
+GENERIC: transmit-packet ( loader id payload payloadSize pResult timeout -- i )
+GENERIC: usage ( loader -- vector )
 
 ! generate a usage text array
-M: loader usage ( -- vector )
-    V{} clone 
+M: loader usage
+    V{ } clone 
     [ "Usage: loader [optons] [script] [file]" swap push ] keep
     [ "    [options]" swap push ] keep
     [ "        -b=<type>        Select target board and subtype (default is default:default)" swap push ] keep
@@ -21,10 +33,11 @@ M: loader usage ( -- vector )
     [ "        configuration file name .cfg" swap push ] keep
     [ "    [file]" swap push ] keep
     [ "        file name of binary file to be loaded" swap push ] keep
+    drop
 ;
 
 
-M: loader set-connection ( loader connection -- )
+M: loader set-connection
     connection<<
 ;
 
@@ -34,9 +47,12 @@ M: loader identify ( loader version -- i )
 ;
 
 
-M: loader load-file ( loader file loadType -- i )
+M: loader load-file
 
-    drop drop drop
+    drop drop drop 
+!    <binfile> [ drop usage f ] [ break <pimage> ] if-empty
+
+
 !    uint8_t *image;
 !    int imageSize;
 !    int sts;
@@ -54,12 +70,12 @@ M: loader load-file ( loader file loadType -- i )
     0
 ;
 
-M: loader fast-load-file ( loader file loadtype -- i )
+M: loader fast-load-file
     drop drop drop 0
 ;
 
 
-M: loader load-image ( loader image imagesize loadtype -- i )
+M: loader load-image
     drop drop drop drop 0
 
 !    // get the binary clock settings
@@ -85,11 +101,11 @@ M: loader load-image ( loader image imagesize loadtype -- i )
 !    return m_connection->loadImage(image, imageSize, loadType);
 ;
 
-M: loader fast-load-image ( loader image imagesize loadtype -- i )
+M: loader fast-load-image
     drop drop drop drop 0
 ;
 
-M: loader read-file ( loader file imagesize -- data )
+M: loader read-file
     drop drop drop 0
 
 !    uint8_t *image;
@@ -117,25 +133,25 @@ M: loader read-file ( loader file imagesize -- data )
 !    return image;
 ;
 
-M: loader fast-load-image-help ( loader image imagesize loadtype clockspeed clockmode baudrate fastloaderbaudrate -- i )
+M: loader fast-load-image-help
     drop drop drop drop drop drop drop drop 0
 ;
 
-M: loader generate-initial-loader-image ( loader clockSpeed clockMode packetID loaderBaudRate fastLoaderBaudRate Length -- i )
+M: loader generate-initial-loader-image
+    drop drop drop drop drop drop drop 0
+;
+
+M: loader transmit-packet
     drop drop drop drop drop drop 0
 ;
 
-M: loader transmit-packet ( loader id payload payloadSize pResult timeout -- i )
-    drop drop drop drop drop drop 0
-;
 
-
-M: loader read-spin-binary-file ( loader fp pImageSize -- i )
+M: loader read-spin-binary-file
     drop drop drop 0
 ;
 
 
-M: loader read-elf-file ( loader fp hdr pImageSize -- i )
+M: loader read-elf-file
     drop drop drop drop 0
 ;
 

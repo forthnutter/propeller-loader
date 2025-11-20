@@ -8,43 +8,38 @@ USING: accessors byte-arrays combinators command-line grouping io io.encodings.b
        tools.continuations vocabs.metadata ;
 
 ! local function found in working directory 
-USING: binfile propeller-loader.loader loaderpropeller-loader.prop-image ;
+USING: propeller-loader.loader propeller-loader.prop-image propeller-loader.propeller-binary ;
 
 IN: propeller-loader
 
-
-: loader-file ( path -- ? )
-    <binfile> [ drop loader-usage f ] [ break <pimage> ] if-empty
-;
-
-: loader-files ( path -- )
-    [ [ loader-usage ] [ loader-file ] if-empty ] each ;
+TUPLE: ploader array ;
 
 ! test if file ok load into a array
-: readentirefile ( loader -- loader' )
-    [ file>> ] keep swap
-    [
-        [ file>> ] keep swap <binfile> >>fbarray
-    ]
-    [
+! : readentirefile ( loader -- loader' )
+!    [ file>> ] keep swap
+!    [
+!        [ file>> ] keep swap <binfile> >>fbarray
+!    ]
+!    [
 
-    ] if ;
+!    ] if ;
+
+: <ploader> ( -- ploader )
+    ploader new
+;
 
 ! idea here is create a fake command line for testing purpose
 : fake-command-line ( -- )
     { "run-loader" "-b" "script" "work/propeller-loader/LargeSpinCode.binary" "LongSpinCode1.binary" } parse-command-line
 ;
 
-: <loader> ( -- obj )
-    load new    ! allocate some memory for tuple
-    V{ } clone >>objarray
-;
+
 
 : run-loader ( -- )
-    <loader>            ! create obj
-    fake-command-line
-    command-line get [ loader-usage ] [ loader-files ] if-empty
-    drop
+    "work/propeller-loader/LargeSpinCode.binary" <pbin>
+!    fake-command-line
+!    command-line get [ loader-usage ] [ loader-files ] if-empty
+    drop drop
 ;
 
 MAIN: run-loader
