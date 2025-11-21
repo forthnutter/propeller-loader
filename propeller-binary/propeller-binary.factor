@@ -165,7 +165,6 @@ M: pbin fullbin
 
 ! validate the binary data
 M: pbin validate
-    break
     ! lets test to see data is smaller the size if header
     [ bdata>> length>> ] keep ! length pbin
     [ spin-header struct-size < ] dip swap not
@@ -187,19 +186,11 @@ M: pbin validate
           
                     [
                         ! make sure there is no data after the code
-                        ! uint16_t idx = hdr->vbase;
-                        [ vbase-get ] keep
-                        [ dbase-get ] keep
-                        [ INIT_CALL_FRAME length - ] dip
-                        [ [ dup ] dip - 7 mask INIT_CALL_FRAME nth ] dip    ! initialCallFrame[idx - (hdr->dbase - sizeof(initialCallFrame))]
-                        [ [ dup ] 2dip bfull>> swap [ nth ] dip = ] keep     ! fullImage[idx] == initialCallFrame[idx - (hdr->dbase - sizeof(initialCallFrame))])))
-!    while (idx < m_imageSize && (fullImage[idx] == 0 || (idx >= hdr->dbase - sizeof(initialCallFrame) && idx < hdr->dbase && fullImage[idx] == initialCallFrame[idx - (hdr->dbase - sizeof(initialCallFrame))])))
-!        ++idx;
-!    if (idx < m_imageSize)
-!        return IMAGE_CORRUPTED;
-                        
-                         t ]
-                    [ "Image corrupted" swap error-add f ] if
+                        [ bfull>> ] keep 
+                        [ vbase-get tail dup length swap [ 0 = ] count INIT_CALL_FRAME length + = ] keep swap
+                        [ drop t ]
+                        [ "Image Corrupted" swap error-add f ] if
+                    ] [ "Image corrupted" swap error-add f ] if
                 ] [ "Image to large" swap error-add f ] if
             ] [ "Image corrupted" swap error-add f ] if
         ] [ "Image to large" swap error-add f ] if

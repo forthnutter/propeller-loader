@@ -39,7 +39,7 @@ TUPLE: ploader array ;
     "work/propeller-loader/LargeSpinCode.binary" <pbin>
 !    fake-command-line
 !    command-line get [ loader-usage ] [ loader-files ] if-empty
-    drop drop
+    drop
 ;
 
 MAIN: run-loader
