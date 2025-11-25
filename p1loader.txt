@@ -1,0 +1,25 @@
+USING: io io.encodings.binary io.files io.serial sequences math ;
+
+! Open serial port
+"/dev/ttyUSB0" <serial> binary <file-reader> dup
+
+! Set baud rate and other parameters
+115200 >>baud
+8 >>data-bits
+1 >>stop-bits
+false >>parity
+true >>raw
+! Load binary file
+"my_program.binary" binary file-contents
+
+! Send Propeller handshake
+[ 0 0 0 0 0 0 0 0 ] write ! 8 zero bytes
+[ 0xF9 0xF9 0xF9 0xF9 ] write ! Sync bytes
+! Wait for response (optional)
+readln .
+
+! Send binary data
+file-contents write
+
+! Close port
+close
